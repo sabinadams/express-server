@@ -1,8 +1,8 @@
-const express = require('express')
-const app = express()
-const parser = require('body-parser');
-const router = require('./controllers/route-index');
-const authorization = require('./middlewares/authorization');
+const express = require('express'),
+    app = express(),
+    parser = require('body-parser'),
+    router = require('./controllers/route-index'),
+    authorization = require('./middlewares/authorization');
 
 // Parsing request/response data
 app.use(parser.json());
@@ -14,6 +14,7 @@ app.use(authorization);
 // Route Initialization
 app.use(router);
 
+// Specifies which port to run the server on.
 app.listen(3000, () => {
     console.log('Example app listening on port 3000!')
 });
