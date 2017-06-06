@@ -18,6 +18,5 @@ module.exports = (req, res, next) => {
     next();
 }
 
-
 // We could just check for a valid session here and not worry about whitelisted routes yet. 
 // In that case we would add middleware for whitelisted routes within the route controller files themselves
