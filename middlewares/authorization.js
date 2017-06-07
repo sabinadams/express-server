@@ -1,35 +1,33 @@
-// Routes that don't require authorization
+var _authModel = require('../models/auth-model');
+
+// Unprotected routes
 let whitelist = [
     '/',
     '/route2',
     '/route3',
     '/route4'
 ];
-var _authModel = require('../models/auth-model');
 
 module.exports = (req, res, next) => {
 
-    if (req.method == 'OPTIONS') {
-        return res.status(200).send({ message: 'Preflight check successful' });
+    // Pre-Flight OPTIONS Request
+    if (req.method == 'OPTIONS') return res.send({ message: 'Preflight check successful' });
+
+    // Checks to see if the route is a non-protected route
+    if (whitelist.indexOf(req.url) != -1) return next();
+
+    // Tries to validate a token
+    try {
+        // Parse the token
+        let token = req.headers.auth.split('bearer ')[1];
+        // Check for a session using that token 
+        _authModel.validateTokenSession(token, (session) => {
+            session ? next() : res.send({ status: 401, message: 'Not Authorized' });
+        });
+    } catch (err) {
+        // This assumes an error occured or no authorization header was present on the request
+        return res.send({ status: 401, message: err });
     }
-
-    // Checks to see if the requested route is a protected route
-    if (whitelist.indexOf(req.url) == -1) {
-
-        try {
-            let token = req.headers.auth.split('bearer ')[1];
-            _authModel.validateTokenSession(token, (session) => {
-                session.logged_in ? next() : res.send({ status: 401, message: 'Not Authorized' });
-            })
-        } catch (err) {
-            return res.status(200).send({ status: 401, message: 'Not Authorized' });
-        }
-
-    } else {
-        // This gets fired if the route was whitelisted (doesn't require authorization)
-        next();
-    }
-
 }
 
 // We could just check for a valid session here and not worry about whitelisted routes yet. 
