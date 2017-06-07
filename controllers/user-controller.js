@@ -1,5 +1,6 @@
 const express = require('express'),
-    router = express.Router();
+    router = express.Router(),
+    _authModel = require('../models/auth-model');
 
 router.post('/', (req, res) => {
     res.send('User Default Post');

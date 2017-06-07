@@ -5,13 +5,21 @@ let whitelist = [
     '/route3',
     '/route4'
 ];
+var _authModel = require('../models/auth-model');
 
 module.exports = (req, res, next) => {
 
     // Checks to see if the requested route is a protected route
     if (whitelist.indexOf(req.url) == -1) {
-        // Change this to do a user lookup for a valid token session based on the authorization token
-        req.headers.auth == 'bearer test' ? next() : res.send({ status: 401, message: 'Not Authorized' })
+        let token = req.headers.auth.split('bearer ')[1];
+        _authModel.validateTokenSession(token, (session) => {
+            console.log(session)
+            if (session.logged_in) {
+                next();
+            } else {
+                res.send({ status: 401, message: 'Not Authorized' });
+            }
+        })
     }
 
     // This gets fired if the route was whitelisted (doesn't require authorization)
