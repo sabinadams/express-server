@@ -22,7 +22,12 @@ module.exports = (req, res, next) => {
         let token = req.headers.auth.split('bearer ')[1];
         // Check for a session using that token 
         _authModel.validateTokenSession(token, (session) => {
-            session ? next() : res.send({ status: 401, message: 'Not Authorized' });
+            if (session.isLoggedIn) {
+                req.user = session.user;
+                next();
+            } else {
+                res.send({ status: 401, message: 'Not Authorized' });
+            }
         });
     } catch (err) {
         // This assumes an error occured or no authorization header was present on the request
