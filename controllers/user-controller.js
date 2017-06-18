@@ -1,12 +1,14 @@
 const express = require('express'),
     router = express.Router(),
-    _authModel = require('../models/auth-model');
+    models = require('../models');
+
 
 router.post('/', (req, res) => {
     res.send('User Default Post');
 })
 
 router.get('/', (req, res) => {
+    console.log(req)
     res.send("User Default Get");
 });
 
@@ -18,4 +20,4 @@ router.post('/user', (req, res) => {
     });
 })
 
-module.exports = router
+module.exports = router;

@@ -1,11 +1,14 @@
-var _authModel = require('../models/auth-model');
+var _authService = require('../services/auth-service');
 
 // Unprotected routes
 let whitelist = [
-    '/',
-    '/route2',
-    '/route3',
-    '/route4'
+    /* Array of strings with the endpoints
+       Example: 
+            '/route',
+            '/anotherRoute',
+            '/thirdRoute
+    */
+    '/auth/login'
 ];
 
 module.exports = (req, res, next) => {
@@ -20,18 +23,26 @@ module.exports = (req, res, next) => {
     try {
         // Parse the token
         let token = req.headers.auth.split('bearer ')[1];
-        // Check for a session using that token 
-        _authModel.validateTokenSession(token, (session) => {
-            if (session.isLoggedIn) {
-                req.user = session.user;
-                next();
+        // Check for a session using that token
+        _authService.validateTokenSession(token, (session) => {
+            // Checks to see if 
+            if (session.user.hasOwnProperty('active') && session.user.active) {
+                if (session.isLoggedIn) {
+                    req.user = session.user || [];
+                    return next();
+                } else {
+                    res.send({ status: 401, message: 'Not Authorized' });
+                }
             } else {
-                res.send({ status: 401, message: 'Not Authorized' });
+                res.send({
+                    status: 401,
+                    message: session.user.hasOwnProperty('active') ? "You account is deactivated." : " Not Authorized"
+                });
             }
         });
     } catch (err) {
         // This assumes an error occured or no authorization header was present on the request
-        return res.send({ status: 401, message: err });
+        return res.send({ status: 401, message: `There was either a problem or you are not authorized to access this endpoint.` });
     }
 }
 

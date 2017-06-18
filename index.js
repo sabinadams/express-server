@@ -1,7 +1,7 @@
 const express = require('express'),
     app = express(),
     parser = require('body-parser'),
-    router = require('./controllers/route-index'),
+    router = require('./controllers/index'),
     authorization = require('./middlewares/authorization');
 
 // Parsing request/response data
